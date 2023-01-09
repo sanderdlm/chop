@@ -13,16 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\SingleCommandApplication;
 
 (new SingleCommandApplication())
-    ->setName('Reset the opcache')
     ->addArgument('fcgi', InputArgument::OPTIONAL, 'Path to a socket file or network address.')
     ->setCode(function (InputInterface $input, OutputInterface $output) {
-        if ($input->hasArgument('fcgi')) {
-            $kernel = new Kernel($input->getArgument('fcgi'));
-        } else {
-            $kernel = new Kernel();
-        }
-
-        $kernel->reset();
+        (new Kernel($input->getArgument('fcgi')))->reset();
 
         return Command::SUCCESS;
     })

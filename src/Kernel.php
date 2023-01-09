@@ -61,8 +61,6 @@ final class Kernel
 
             $IPv6 = '/^(?:[A-F0-9]{0,4}:){1,7}[A-F0-9]{0,4}$/';
             if (preg_match($IPv6, $host) === 1) {
-                // IPv6 addresses need to be surrounded by brackets
-                // see: https://www.php.net/manual/en/function.stream-socket-client.php#refsect1-function.stream-socket-client-notes
                 $host = "[$host]";
             }
 
@@ -83,12 +81,13 @@ final class Kernel
 
     public function reset(): void
     {
-        $file = $this->createResetScript();
+        $file = sprintf("%s/analogo-%s.php", sys_get_temp_dir(), bin2hex(random_bytes(16)));
+
+        file_put_contents($file, '<?php opcache_reset();');
+        chmod($file, 0666);
 
         try {
-            $client = new Client();
-            $request = new PostRequest($file, '');
-            $client->sendRequest($this->connection, $request);
+            (new Client())->sendRequest($this->connection, new PostRequest($file, ''));
 
             unlink($file);
         } catch (\Throwable $exception) {
@@ -100,21 +99,5 @@ final class Kernel
                 $exception
             );
         }
-    }
-
-    protected function createResetScript(): string
-    {
-        $resetScript = <<<RESET
-<?php
-opcache_reset();
-
-RESET;
-
-        $file = sprintf("%s/analogo-%s.php", sys_get_temp_dir(), bin2hex(random_bytes(16)));
-
-        file_put_contents($file, $resetScript);
-        chmod($file, 0666);
-
-        return $file;
     }
 }
