@@ -1,0 +1,29 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require __DIR__ . '/../../autoload.php';
+
+use Analogo\Kernel;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\SingleCommandApplication;
+
+(new SingleCommandApplication())
+    ->setName('Reset the opcache')
+    ->addArgument('fcgi', InputArgument::OPTIONAL, 'Path to a socket file or network address.')
+    ->setCode(function (InputInterface $input, OutputInterface $output) {
+        if ($input->hasArgument('fcgi')) {
+            $kernel = new Kernel($input->getArgument('fcgi'));
+        } else {
+            $kernel = new Kernel();
+        }
+
+        $kernel->reset();
+
+        return Command::SUCCESS;
+    })
+    ->run();

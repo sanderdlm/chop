@@ -1,0 +1,12 @@
+services:
+  errorFormatter.junit:
+    class: PHPStan\Command\ErrorFormatter\JUnitErrorFormatter
+parameters:
+  reportUnmatchedIgnoredErrors: false
+  checkGenericClassInNonGenericObjectType: false
+  inferPrivatePropertyTypeFromConstructor: true
+  level: 9
+  paths:
+    - src/
+  ignoreErrors:
+
