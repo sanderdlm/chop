@@ -1,0 +1,6 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Readonly property Analogo\\\\Kernel\\:\\:\\$connection is already assigned\\.$#"
+			count: 1
+			path: src/Kernel.php

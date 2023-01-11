@@ -1,3 +1,5 @@
+includes:
+	- phpstan-baseline.neon
 services:
   errorFormatter.junit:
     class: PHPStan\Command\ErrorFormatter\JUnitErrorFormatter
