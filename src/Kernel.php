@@ -14,8 +14,8 @@ use Throwable;
 
 final class Kernel
 {
-    private ConfiguresSocketConnection $connection;
-    private string $host;
+    public readonly ConfiguresSocketConnection $connection;
+    public readonly string $host;
     /** @var string[] */
     private const POSSIBLE_SOCKET_FILE_PATTERNS = [
         '/var/run/php*.sock',
@@ -58,7 +58,7 @@ final class Kernel
         $this->host = $host;
 
         if (str_contains($host, ':')) {
-            $last = strrpos($host, ':');
+            $last = strrpos($host, ':') ?: null;
             $port = substr($host, $last + 1, strlen($host));
             $host = substr($host, 0, $last);
 
