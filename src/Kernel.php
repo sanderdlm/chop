@@ -10,6 +10,7 @@ use hollodotme\FastCGI\Requests\PostRequest;
 use hollodotme\FastCGI\SocketConnections\NetworkSocket;
 use hollodotme\FastCGI\SocketConnections\UnixDomainSocket;
 use RuntimeException;
+use Throwable;
 
 final class Kernel
 {
@@ -38,8 +39,10 @@ final class Kernel
 
                 if (count($matchingFiles) > 1) {
                     foreach ($matchingFiles as $file) {
-                        if (str_contains($file, (string) PHP_MAJOR_VERSION) &&
-                            str_contains($file, (string) PHP_MINOR_VERSION)) {
+                        if (
+                            str_contains($file, (string) PHP_MAJOR_VERSION) &&
+                            str_contains($file, (string) PHP_MINOR_VERSION)
+                        ) {
                             $host = $file;
                             break;
                         }
@@ -55,9 +58,9 @@ final class Kernel
         $this->host = $host;
 
         if (str_contains($host, ':')) {
-            $parts = explode(':', $host);
-            $host = end($parts);
-            $port = reset($parts);
+            $last = strrpos($host, ':');
+            $port = substr($host, $last + 1, strlen($host));
+            $host = substr($host, 0, $last);
 
             $IPv6 = '/^(?:[A-F0-9]{0,4}:){1,7}[A-F0-9]{0,4}$/';
             if (preg_match($IPv6, $host) === 1) {
@@ -90,7 +93,7 @@ final class Kernel
             (new Client())->sendRequest($this->connection, new PostRequest($file, ''));
 
             unlink($file);
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             unlink($file);
 
             throw new RuntimeException(

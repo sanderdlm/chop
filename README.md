@@ -1,6 +1,7 @@
 # Analogo
+a.k.a "cachetool-lite"
 
-Minimal dependency to reset the content of the OPcache through PHP-FPM.
+Minimal CLI tool to reset the content of OPcache without reloading PHP-FPM.
 
 ## Installation
 
@@ -13,7 +14,7 @@ If no option is passed, it'll look for a php-fpm socket file in all the common p
 
 If no file can be found, it will default to 127.0.0.1:9000.
 
-Since this is a single-command application, you just need to call the binary:
+This is a single-command application, so you don't have to specify a command.
     
     php /path/to/your/project/vendor/bin/analogo
 
@@ -21,6 +22,17 @@ You can also pass an IP address or a unix socket to the --fcgi option.
 
     php /path/to/your/project/vendor/bin/analogo --fcgi=/var/run/php-fpm.sock
 
+## Deployer integration
+Define a task with the command
+
+    task('clear:opcache', function () {
+        run('{{bin/php}} {{ release_path }}/vendor/bin/analogo');
+    });
+
+Call the task after your deployment
+
+    after('deploy:symlink', 'clear:opcache');
+
 ## Credit
 
-This tool is of course inspired and based on the awesome [cachetool](https://github.com/gordalina/cachetool). All of the FCGI socket code is handled by [hollodotme/fast-cgi-client](https://github.com/hollodotme/fast-cgi-client).
+This tool is of course inspired and based on the awesome [cachetool](https://github.com/gordalina/cachetool). All the FCGI socket code is handled by [hollodotme/fast-cgi-client](https://github.com/hollodotme/fast-cgi-client).
