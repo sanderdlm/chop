@@ -14,8 +14,25 @@ use Symfony\Component\Console\SingleCommandApplication;
 
 (new SingleCommandApplication())
     ->addArgument('fcgi', InputArgument::OPTIONAL, 'Path to a socket file or network address.')
+    ->addOption('quiet', 'q')
     ->setCode(function (InputInterface $input, OutputInterface $output) {
-        (new Kernel($input->getArgument('fcgi')))->reset();
+        $kernel = new Kernel($input->getArgument('fcgi'));
+
+        $status = $kernel->reset();
+
+        if (!$status) {
+            if (!$input->getOption('quiet')) {
+                $output->writeln('<error>OPcache disabled</error>');
+            }
+
+            return Command::FAILURE;
+        }
+
+        if (!$input->getOption('quiet')) {
+            $output->writeln(sprintf('<info>OPcache cleared (%s)</info>',
+                $kernel->host
+            ));
+        }
 
         return Command::SUCCESS;
     })

@@ -82,24 +82,25 @@ final class Kernel
         }
     }
 
-    public function reset(): void
+    public function reset(): bool
     {
         $file = sprintf("%s/analogo-%s.php", sys_get_temp_dir(), bin2hex(random_bytes(16)));
 
-        file_put_contents($file, '<?php opcache_reset();');
+        file_put_contents($file, '<?= opcache_reset();');
         chmod($file, 0666);
 
         try {
-            (new Client())->sendRequest($this->connection, new PostRequest($file, ''));
+            $response = (new Client())->sendRequest($this->connection, new PostRequest($file, ''));
 
             unlink($file);
+
+            return (bool) $response->getBody();
         } catch (Throwable $exception) {
             unlink($file);
 
             throw new RuntimeException(
                 sprintf('FastCGI error: %s (host: %s)', $exception->getMessage(), $this->host),
-                $exception->getCode(),
-                $exception
+                $exception->getCode()
             );
         }
     }
