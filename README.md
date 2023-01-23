@@ -1,26 +1,30 @@
 # Analogo
 a.k.a "cachetool-lite"
 
-Minimal CLI tool to reset the content of OPcache without reloading PHP-FPM.
+Reset the content of OPcache without reloading PHP-FPM.
 
 ## Installation
 
     composer require dreadnip/analogo
 
 ## Usage
-This tool only supports OPcache and fcgi/PHP-FPM.
+The tool attempts to use sane defaults:
 
-If no option is passed, it'll look for a php-fpm socket file in all the common places. If multiple are found, it'll try to select one for your PHP version.
+ * If no argument is passed, it'll look for a php-fpm socket file in all the common places. If multiple are found, it'll try to select one for your PHP version.
 
-If no file can be found, it will default to 127.0.0.1:9000.
+ * If no file can be found, it will default to 127.0.0.1:9000.
 
-This is a single-command application, so you don't have to specify a command.
+This is a single-command application, so calling the binary is enough:
     
     php /path/to/your/project/vendor/bin/analogo
 
-You can also pass an IP address or a unix socket to the --fcgi option.
+If the defaults don't work for you, you can also explicitly pass an IP address or a path to a socket file using the --fcgi option:
 
     php /path/to/your/project/vendor/bin/analogo --fcgi=/var/run/php-fpm.sock
+
+By default, the output of the command (true for success, false for failure) will be printed to the console. You can suppress this output with the `--quiet` option (shorthand `-q`)
+
+        php /path/to/your/project/vendor/bin/analogo -q
 
 ## Deployer integration
 Define a task with the command
@@ -35,4 +39,4 @@ Call the task after your deployment
 
 ## Credit
 
-This tool is of course inspired and based on the awesome [cachetool](https://github.com/gordalina/cachetool). All the FCGI socket code is handled by [hollodotme/fast-cgi-client](https://github.com/hollodotme/fast-cgi-client).
+This tool is of course inspired and based on the awesome [cachetool](https://github.com/gordalina/cachetool). All the FastCGI socket code is handled by [hollodotme/fast-cgi-client](https://github.com/hollodotme/fast-cgi-client).
