@@ -1,8 +1,8 @@
 <?php
 
-namespace Jug\Test;
+namespace Chop\Test;
 
-use Analogo\Kernel;
+use Chop\Kernel;
 use hollodotme\FastCGI\SocketConnections\NetworkSocket;
 use hollodotme\FastCGI\SocketConnections\UnixDomainSocket;
 use PHPUnit\Framework\TestCase;

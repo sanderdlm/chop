@@ -9,7 +9,7 @@
          bootstrap="vendor/autoload.php"
 >
     <testsuites>
-        <testsuite name="Analogo Test Suite">
+        <testsuite name="chop Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

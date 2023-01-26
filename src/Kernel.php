@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Analogo;
+namespace Chop;
 
 use hollodotme\FastCGI\Client;
 use hollodotme\FastCGI\Interfaces\ConfiguresSocketConnection;
@@ -14,8 +14,8 @@ use Throwable;
 
 final class Kernel
 {
-    public readonly ConfiguresSocketConnection $connection;
-    public readonly string $host;
+    public ConfiguresSocketConnection $connection;
+    public string $host;
     /** @var string[] */
     private const POSSIBLE_SOCKET_FILE_PATTERNS = [
         '/var/run/php*.sock',
@@ -40,8 +40,8 @@ final class Kernel
                 if (count($matchingFiles) > 1) {
                     foreach ($matchingFiles as $file) {
                         if (
-                            str_contains($file, (string) PHP_MAJOR_VERSION) &&
-                            str_contains($file, (string) PHP_MINOR_VERSION)
+                            strpos($file, (string) PHP_MAJOR_VERSION) !== false &&
+                            strpos($file, (string) PHP_MINOR_VERSION) !== false
                         ) {
                             $host = $file;
                             break;
@@ -57,7 +57,7 @@ final class Kernel
 
         $this->host = $host;
 
-        if (str_contains($host, ':')) {
+        if (strpos($host, ':') !== false) {
             $last = strrpos($host, ':') ?: null;
             $port = substr($host, $last + 1, strlen($host));
             $host = substr($host, 0, $last);
@@ -68,23 +68,23 @@ final class Kernel
             }
 
             $this->connection = new NetworkSocket(
-                host: $host,
-                port: (int) $port,
-                connectTimeout: 5000,
-                readWriteTimeout:120000
+                $host,
+                (int) $port,
+                5000,
+                120000
             );
         } else {
             $this->connection = new UnixDomainSocket(
-                socketPath: $host,
-                connectTimeout: 5000,
-                readWriteTimeout: 120000
+                $host,
+                5000,
+                120000
             );
         }
     }
 
     public function reset(): bool
     {
-        $file = sprintf("%s/analogo-%s.php", sys_get_temp_dir(), bin2hex(random_bytes(16)));
+        $file = sprintf("%s/chop-%s.php", sys_get_temp_dir(), bin2hex(random_bytes(16)));
 
         file_put_contents($file, '<?= opcache_reset();');
         chmod($file, 0666);

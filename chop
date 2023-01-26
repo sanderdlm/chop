@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../../autoload.php';
 
-use Analogo\Kernel;
+use Chop\Kernel;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
