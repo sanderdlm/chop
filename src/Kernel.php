@@ -18,9 +18,9 @@ final class Kernel
     public string $host;
     /** @var string[] */
     private const POSSIBLE_SOCKET_FILE_PATTERNS = [
+        '~/.sock/*.sock',
         '/var/run/php*.sock',
         '/var/run/php/*.sock',
-        '~/.sock/*.sock',
     ];
 
     public function __construct(string $host = null)

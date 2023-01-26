@@ -1,7 +1,7 @@
 # chop
 a.k.a "cachetool-lite"
 
-Reset the content of OPcache without reloading PHP-FPM.
+Reset the OPcache content from the CLI, without reloading PHP-FPM.
 
 ## Installation
 
@@ -10,7 +10,7 @@ Reset the content of OPcache without reloading PHP-FPM.
 ## Usage
 The tool attempts to use sane defaults:
 
- * If no argument is passed, it'll look for a php-fpm socket file in all the common places. If multiple are found, it'll try to select one for your PHP version.
+ * If no argument is passed, it'll look for a php-fpm socket file in all the common places. If multiple are found, it'll try to select one that contains your PHP version.
 
  * If no file can be found, it will default to 127.0.0.1:9000.
 
@@ -39,4 +39,6 @@ Call the task after your deployment
 
 ## Credit
 
-This tool is of course inspired and based on the awesome [cachetool](https://github.com/gordalina/cachetool). All the FastCGI socket code is handled by [hollodotme/fast-cgi-client](https://github.com/hollodotme/fast-cgi-client).
+This tool is of course inspired and based on the awesome [cachetool](https://github.com/gordalina/cachetool). 
+
+Just like cachetool, the FastCGI socket code is handled by [hollodotme/fast-cgi-client](https://github.com/hollodotme/fast-cgi-client).
