@@ -14,8 +14,7 @@ use Throwable;
 
 final class Kernel
 {
-    public ConfiguresSocketConnection $connection;
-    public string $host;
+    public readonly ConfiguresSocketConnection $connection;
     /** @var string[] */
     private const POSSIBLE_SOCKET_FILE_PATTERNS = [
         '~/.sock/*.sock',
@@ -26,58 +25,23 @@ final class Kernel
     public function __construct(string $host = null)
     {
         if ($host === null) {
-            foreach (self::POSSIBLE_SOCKET_FILE_PATTERNS as $possibleSocketFilePattern) {
-                $matchingFiles = glob($possibleSocketFilePattern);
-
-                if (!$matchingFiles) {
-                    continue;
-                }
-
-                if (file_exists($matchingFiles[0])) {
-                    $host = $matchingFiles[0];
-                }
-
-                if (count($matchingFiles) > 1) {
-                    foreach ($matchingFiles as $file) {
-                        if (
-                            strpos($file, (string) PHP_MAJOR_VERSION) !== false &&
-                            strpos($file, (string) PHP_MINOR_VERSION) !== false
-                        ) {
-                            $host = $file;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if ($host === null) {
-                $host = '127.0.0.1:9000';
-            }
+            $host = $this->locateSocketPath() ?? '127.0.0.1:9000';
         }
 
-        $this->host = $host;
-
-        if (strpos($host, ':') !== false) {
-            $last = strrpos($host, ':') ?: null;
-            $port = substr($host, $last + 1, strlen($host));
-            $host = substr($host, 0, $last);
-
-            $IPv6 = '/^(?:[A-F0-9]{0,4}:){1,7}[A-F0-9]{0,4}$/';
-            if (preg_match($IPv6, $host) === 1) {
-                $host = "[$host]";
-            }
-
-            $this->connection = new NetworkSocket(
-                $host,
-                (int) $port,
-                5000,
-                120000
+        if (file_exists($host)) {
+            $this->connection = new UnixDomainSocket(
+                socketPath: $host,
+                connectTimeout: 5000,
+                readWriteTimeout: 12000
             );
         } else {
-            $this->connection = new UnixDomainSocket(
-                $host,
-                5000,
-                120000
+            [$host, $port] = $this->determineHostAndPort($host);
+
+            $this->connection = new NetworkSocket(
+                host: $host,
+                port: (int) $port,
+                connectTimeout: 5000,
+                readWriteTimeout: 12000
             );
         }
     }
@@ -99,9 +63,59 @@ final class Kernel
             unlink($file);
 
             throw new RuntimeException(
-                sprintf('FastCGI error: %s (host: %s)', $exception->getMessage(), $this->host),
+                sprintf(
+                    'FastCGI error: %s (host: %s)',
+                    $exception->getMessage(),
+                    $this->connection->getSocketAddress()
+                ),
                 $exception->getCode()
             );
         }
+    }
+
+    private function locateSocketPath(): ?string
+    {
+        $socketPath = null;
+
+        foreach (self::POSSIBLE_SOCKET_FILE_PATTERNS as $possibleSocketFilePattern) {
+            $matchingFiles = glob($possibleSocketFilePattern);
+
+            if (!$matchingFiles) {
+                continue;
+            }
+
+            if (file_exists($matchingFiles[0])) {
+                $socketPath = $matchingFiles[0];
+            }
+
+            if (count($matchingFiles) > 1) {
+                foreach ($matchingFiles as $file) {
+                    if (
+                        str_contains($file, (string)PHP_MAJOR_VERSION) &&
+                        str_contains($file, (string)PHP_MINOR_VERSION)
+                    ) {
+                        $socketPath = $file;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return $socketPath;
+    }
+
+    /** @return string[] */
+    private function determineHostAndPort(string $host): array
+    {
+        $last = strrpos($host, ':') ?: null;
+        $port = substr($host, $last + 1, strlen($host));
+        $host = substr($host, 0, $last);
+
+        $IPv6 = '/^(?:[A-F0-9]{0,4}:){1,7}[A-F0-9]{0,4}$/';
+        if (preg_match($IPv6, $host) === 1) {
+            $host = "[$host]";
+        }
+
+        return [$host, $port];
     }
 }
