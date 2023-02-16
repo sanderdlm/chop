@@ -33,11 +33,21 @@ class KernelTest extends TestCase
         $this->assertEquals('unix://' . __DIR__ . '/pseudo.sock', $kernel->connection->getSocketAddress());
     }
 
-    public function testHostDetection(): void
+    public function testHostDetectionWithPhpVersion(): void
     {
+        $socketFolder = getenv('HOME') . '/.sock';
+
+        mkdir($socketFolder);
+        file_put_contents($socketFolder . '/pseudo81.sock', '');
+        file_put_contents($socketFolder . '/pseudo80.sock', '');
+        file_put_contents($socketFolder . '/pseudo.sock', '');
         $kernel = new Kernel();
 
-        // @TODO: figure out how to test host detection
-        //$this->assertInstanceOf(UnixDomainSocket::class, $kernel->connection);
+        $this->assertEquals('unix://' . $socketFolder . '/pseudo81.sock', $kernel->connection->getSocketAddress());
+
+        unlink($socketFolder . '/pseudo81.sock');
+        unlink($socketFolder . '/pseudo80.sock');
+        unlink($socketFolder . '/pseudo.sock');
+        rmdir($socketFolder);
     }
 }

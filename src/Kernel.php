@@ -76,19 +76,25 @@ final class Kernel
     private function locateSocketPath(): ?string
     {
         foreach (self::POSSIBLE_SOCKET_FILE_PATTERNS as $possibleSocketFilePattern) {
-            $matchingFiles = glob($possibleSocketFilePattern);
+            $resolvedPattern = str_replace(
+                '~',
+                $_SERVER['HOME'],
+                $possibleSocketFilePattern
+            );
+
+            $matchingFiles = glob($resolvedPattern);
 
             if (!$matchingFiles) {
                 continue;
             }
 
             if (count($matchingFiles) > 1) {
-                foreach ($matchingFiles as $file) {
+                foreach ($matchingFiles as $possibleSocketFile) {
                     if (
-                        str_contains($file, (string)PHP_MAJOR_VERSION) &&
-                        str_contains($file, (string)PHP_MINOR_VERSION)
+                        str_contains($possibleSocketFile, (string)PHP_MAJOR_VERSION) &&
+                        str_contains($possibleSocketFile, (string)PHP_MINOR_VERSION)
                     ) {
-                        return $file;
+                        return $possibleSocketFile;
                     }
                 }
             }
