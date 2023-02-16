@@ -97,6 +97,8 @@ final class Kernel
                 return $matchingFiles[0];
             }
         }
+
+        return null;
     }
 
     /** @return string[] */
