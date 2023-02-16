@@ -30,7 +30,7 @@ use Symfony\Component\Console\SingleCommandApplication;
 
         if (!$input->getOption('quiet')) {
             $output->writeln(sprintf('<info>OPcache cleared (%s)</info>',
-                $kernel->host
+                $kernel->connection->getSocketAddress()
             ));
         }
 
