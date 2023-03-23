@@ -20,6 +20,7 @@ final class Kernel
         '~/.sock/*.sock',
         '/var/run/php*.sock',
         '/var/run/php/*.sock',
+        '/var/run/php-fpm/*.sock',
     ];
 
     public function __construct(string $host = null)
