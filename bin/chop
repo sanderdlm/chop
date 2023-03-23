@@ -3,7 +3,13 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../../autoload.php';
+foreach ([__DIR__ . '/../../../autoload.php', __DIR__ . '/../vendor/autoload.php'] as $file) {
+    if (file_exists($file)) {
+        require $file;
+        $loaded = true;
+        break;
+    }
+}
 
 use Chop\Kernel;
 use Symfony\Component\Console\Command\Command;
@@ -16,6 +22,8 @@ use Symfony\Component\Console\SingleCommandApplication;
     ->addArgument('fcgi', InputArgument::OPTIONAL, 'Path to a socket file or network address.')
     ->addOption('quiet', 'q')
     ->setCode(function (InputInterface $input, OutputInterface $output) {
+        $output->writeln('Running in ' . __DIR__ . ' on ' . PHP_VERSION);
+
         $kernel = new Kernel($input->getArgument('fcgi'));
 
         $status = $kernel->reset();

@@ -22,5 +22,5 @@
             "Chop\\Test\\": "tests/"
         }
     },
-    "bin": ["chop"]
+    "bin": ["bin/chop"]
 }
