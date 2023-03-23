@@ -27,10 +27,18 @@ class KernelTest extends TestCase
 
     public function testSocketConnection(): void
     {
-        $kernel = new Kernel(__DIR__ . '/pseudo.sock');
+        $socketFolder = getenv('HOME') . '/.sock';
+
+        mkdir($socketFolder);
+        file_put_contents($socketFolder . '/pseudo.sock', '');
+
+        $kernel = new Kernel($socketFolder . '/pseudo.sock');
 
         $this->assertInstanceOf(UnixDomainSocket::class, $kernel->connection);
-        $this->assertEquals('unix://' . __DIR__ . '/pseudo.sock', $kernel->connection->getSocketAddress());
+        $this->assertEquals('unix://' . $socketFolder . '/pseudo.sock', $kernel->connection->getSocketAddress());
+
+        unlink($socketFolder . '/pseudo.sock');
+        rmdir($socketFolder);
     }
 
     public function testHostDetectionWithPhpVersion(): void
@@ -38,14 +46,14 @@ class KernelTest extends TestCase
         $socketFolder = getenv('HOME') . '/.sock';
 
         mkdir($socketFolder);
-        file_put_contents($socketFolder . '/pseudo81.sock', '');
+        file_put_contents($socketFolder . '/pseudo82.sock', '');
         file_put_contents($socketFolder . '/pseudo80.sock', '');
         file_put_contents($socketFolder . '/pseudo.sock', '');
         $kernel = new Kernel();
 
-        $this->assertEquals('unix://' . $socketFolder . '/pseudo81.sock', $kernel->connection->getSocketAddress());
+        $this->assertEquals('unix://' . $socketFolder . '/pseudo82.sock', $kernel->connection->getSocketAddress());
 
-        unlink($socketFolder . '/pseudo81.sock');
+        unlink($socketFolder . '/pseudo82.sock');
         unlink($socketFolder . '/pseudo80.sock');
         unlink($socketFolder . '/pseudo.sock');
         rmdir($socketFolder);
