@@ -3,6 +3,10 @@
 
 declare(strict_types=1);
 
+if (php_sapi_name() !== 'cli') {
+    exit;
+}
+
 foreach ([__DIR__ . '/../../../autoload.php', __DIR__ . '/../vendor/autoload.php'] as $file) {
     if (file_exists($file)) {
         require $file;
@@ -11,37 +15,28 @@ foreach ([__DIR__ . '/../../../autoload.php', __DIR__ . '/../vendor/autoload.php
     }
 }
 
+require __DIR__ . '/../vendor/autoload.php';
+
 use Chop\Kernel;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\SingleCommandApplication;
 
-(new SingleCommandApplication())
-    ->addArgument('fcgi', InputArgument::OPTIONAL, 'Path to a socket file or network address.')
-    ->addOption('quiet', 'q')
-    ->setCode(function (InputInterface $input, OutputInterface $output) {
-        $output->writeln('Running in ' . __DIR__ . ' on ' . PHP_VERSION);
+$fcgiArgumentPassed = array_search('--fcgi', $argv);
 
-        $kernel = new Kernel($input->getArgument('fcgi'));
+if (false !== $fcgiArgumentPassed) {
+    $fcgi = $argv[$fcgiArgumentPassed + 1];
+}
 
-        $status = $kernel->reset();
+$kernel = new Kernel($fcgi ?? null);
+$status = $kernel->reset();
 
-        if (!$status) {
-            if (!$input->getOption('quiet')) {
-                $output->writeln('<error>OPcache disabled</error>');
-            }
+if (true === in_array('-q', $argv)) {
+    exit;
+}
 
-            return Command::FAILURE;
-        }
-
-        if (!$input->getOption('quiet')) {
-            $output->writeln(sprintf('<info>OPcache cleared (%s)</info>',
-                $kernel->connection->getSocketAddress()
-            ));
-        }
-
-        return Command::SUCCESS;
-    })
-    ->run();
+if (!$status) {
+    echo 'OPcache disabled' . PHP_EOL;
+} else {
+    echo sprintf(
+            'OPcache cleared (%s)',
+            $kernel->connection->getSocketAddress()
+        ) . PHP_EOL;
+}
