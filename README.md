@@ -1,11 +1,9 @@
 # chop
 Reset the OPcache content from the CLI, without reloading PHP-FPM.
 
-Basically [cachetool](https://github.com/gordalina/cachetool), but without support for the APCu cache, realpath cache and none of the extra opcache commands.
+Operates the same way [cachetool](https://github.com/gordalina/cachetool) does, but is much smaller. Chop can only do one thing: clear the opcache content. There is no support for the APCu cache, realpath cache and none of the extra opcache commands that cachetool has.
 
-Just opcache:clear, nothing else.
-
-Also installed as a dependency through Composer, for easier coupling with the PHP version of your application.
+Chop also has no dependencies besides [hollodotme/fast-cgi-client](https://github.com/hollodotme/fast-cgi-client). This makes it unlikely to conflict with the dependencies of your own project. Because of this, there is no need to use Chop as a PHAR. Installing it through Composer results in easier coupling with the PHP version of your application.
 
 ## Installation
 
