@@ -2,8 +2,7 @@
     "name": "dreadnip/chop",
     "description": "Clear opcache through php-fpm",
     "require": {
-        "php": "^8.1",
-        "symfony/console": "^6.2",
+        "php": "^8.0",
         "hollodotme/fast-cgi-client": "^3.1"
     },
     "require-dev": {
