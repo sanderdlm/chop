@@ -10,12 +10,9 @@ if (php_sapi_name() !== 'cli') {
 foreach ([__DIR__ . '/../../../autoload.php', __DIR__ . '/../vendor/autoload.php'] as $file) {
     if (file_exists($file)) {
         require $file;
-        $loaded = true;
         break;
     }
 }
-
-require __DIR__ . '/../vendor/autoload.php';
 
 use Chop\Kernel;
 
