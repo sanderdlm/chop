@@ -15,7 +15,7 @@ This is a single-command application, so calling the binary is enough:
 
     php /path/to/your/project/vendor/bin/chop
 
-By default, the command will print a success message or error to the console. You can suppress this output with the `--quiet` option (shorthand `-q`)
+By default, the command will print a success message or error to the console. You can suppress this output with the `-q` option.
 
     php /path/to/your/project/vendor/bin/chop -q
 
