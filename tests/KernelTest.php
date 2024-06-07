@@ -44,15 +44,18 @@ class KernelTest extends TestCase
     public function testHostDetectionWithPhpVersion(): void
     {
         $socketFolder = getenv('HOME') . '/.sock';
+        $version = PHP_MAJOR_VERSION . PHP_MINOR_VERSION;
 
         mkdir($socketFolder);
+        file_put_contents($socketFolder . '/pseudo83.sock', '');
         file_put_contents($socketFolder . '/pseudo82.sock', '');
         file_put_contents($socketFolder . '/pseudo80.sock', '');
         file_put_contents($socketFolder . '/pseudo.sock', '');
         $kernel = new Kernel();
 
-        $this->assertEquals('unix://' . $socketFolder . '/pseudo82.sock', $kernel->connection->getSocketAddress());
+        $this->assertEquals('unix://' . $socketFolder . '/pseudo'.$version.'.sock', $kernel->connection->getSocketAddress());
 
+        unlink($socketFolder . '/pseudo83.sock');
         unlink($socketFolder . '/pseudo82.sock');
         unlink($socketFolder . '/pseudo80.sock');
         unlink($socketFolder . '/pseudo.sock');
