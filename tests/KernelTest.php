@@ -45,6 +45,7 @@ class KernelTest extends TestCase
     {
         $socketFolder = getenv('HOME') . '/.sock';
         $version = PHP_MAJOR_VERSION . PHP_MINOR_VERSION;
+        $expectedSocket = 'unix://' . $socketFolder . '/pseudo' . $version . '.sock';
 
         mkdir($socketFolder);
         file_put_contents($socketFolder . '/pseudo83.sock', '');
@@ -53,7 +54,7 @@ class KernelTest extends TestCase
         file_put_contents($socketFolder . '/pseudo.sock', '');
         $kernel = new Kernel();
 
-        $this->assertEquals('unix://' . $socketFolder . '/pseudo'.$version.'.sock', $kernel->connection->getSocketAddress());
+        $this->assertEquals($expectedSocket, $kernel->connection->getSocketAddress());
 
         unlink($socketFolder . '/pseudo83.sock');
         unlink($socketFolder . '/pseudo82.sock');
