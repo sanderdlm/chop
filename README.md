@@ -45,7 +45,7 @@ When no file socket file can be found, it will default to 127.0.0.1:9000.
 
 If the defaults don't work for you, you can also explicitly pass an IP address or a path to a socket file using the --fcgi option:
 
-    php /path/to/your/project/vendor/bin/chop --fcgi=/var/run/php-fpm.sock
+    php /path/to/your/project/vendor/bin/chop --fcgi /var/run/php-fpm.sock
 
 ## Deployer integration
 Define a task with the command
