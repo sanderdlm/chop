@@ -2,61 +2,38 @@ name: Test & static analysis
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
-  phpstan:
-    runs-on: "ubuntu-latest"
+  qa:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        task: [phpstan, phpcs, phpunit]
 
     steps:
-    - name: "Checkout code"
-      uses: "actions/checkout@v4"
+      - uses: actions/checkout@v4
 
-    - name: "Install PHP"
-      uses: "shivammathur/setup-php@v2"
-      with:
-        php-version: "8.3"
-
-    - name: "Install dependencies with Composer"
-      uses: "ramsey/composer-install@v2"
-
-    - name: "Run a static analysis with phpstan/phpstan"
-      run: "vendor/bin/phpstan analyse --memory-limit=2G"
-      
-  phpcs:
-    runs-on: "ubuntu-latest"
-
-    steps:
-    - name: "Checkout code"
-      uses: "actions/checkout@v4"
-
-    - name: "Install PHP"
-      uses: "shivammathur/setup-php@v2"
-      with:
-        php-version: "8.3"
-
-    - name: "Install dependencies with Composer"
-      uses: "ramsey/composer-install@v2"
-
-    - name: "Run phpcs"
-      run: "vendor/bin/phpcs"
-
-  phpunit:
-    runs-on: "ubuntu-latest"
-
-    steps:
-      - name: "Checkout code"
-        uses: "actions/checkout@v4"
-
-      - name: "Install PHP"
-        uses: "shivammathur/setup-php@v2"
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
+          tools: composer:v2
+          coverage: none
+          ini-values: memory_limit=-1
 
-      - name: "Install dependencies with Composer"
-        uses: "ramsey/composer-install@v2"
+      - uses: ramsey/composer-install@v3
+        with:
+          dependency-versions: locked
+          composer-options: "--optimize-autoloader"
 
-      - name: "Run phpunit"
-        run: "vendor/bin/phpunit"
+      - run: composer ${{ matrix.task }}
