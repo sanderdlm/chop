@@ -23,7 +23,7 @@ final class Kernel
         '/var/run/php-fpm/*.sock',
     ];
 
-    public function __construct(string $host = null)
+    public function __construct(?string $host = null)
     {
         if ($host === null) {
             $host = $this->locateSocketPath() ?? '127.0.0.1:9000';
